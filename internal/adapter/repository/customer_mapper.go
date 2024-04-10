@@ -20,22 +20,24 @@ func (m *CustomerMapper) ToDatabaseModel(entity *entity.Customer) *po.Customer {
 			CreatedAt: entity.CreatedAt,
 			UpdatedAt: entity.UpdatedAt,
 		},
-		Active:    entity.Active,
-		Email:     entity.Email.String(),
-		Age:       entity.CustomerInfo.Age(),
-		FirstName: entity.CustomerInfo.FirstName(),
-		LastName:  entity.CustomerInfo.LastName(),
+		Active:         entity.Active,
+		Email:          entity.Email.String(),
+		HashedPassword: entity.HashedPassword,
+		Age:            entity.CustomerInfo.Age(),
+		FirstName:      entity.CustomerInfo.FirstName(),
+		LastName:       entity.CustomerInfo.LastName(),
 	}
 }
 
 func (m *CustomerMapper) ToDomainEntity(model *po.Customer) *entity.Customer {
 	email, _ := valueobject.NewEmail(model.Email)
 	return &entity.Customer{
-		ID:           model.ID,
-		Active:       model.Active,
-		Email:        email,
-		CustomerInfo: valueobject.NewCustomerInfo(model.Age, model.FirstName, model.LastName),
-		CreatedAt:    model.CreatedAt,
-		UpdatedAt:    model.UpdatedAt,
+		ID:             model.ID,
+		Active:         model.Active,
+		Email:          email,
+		HashedPassword: model.HashedPassword,
+		CustomerInfo:   valueobject.NewCustomerInfo(model.Age, model.FirstName, model.LastName),
+		CreatedAt:      model.CreatedAt,
+		UpdatedAt:      model.UpdatedAt,
 	}
 }

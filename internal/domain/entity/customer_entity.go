@@ -7,12 +7,13 @@ import (
 )
 
 type Customer struct {
-	ID           uint
-	Active       bool
-	Email        *valueobject.Email
-	CustomerInfo *valueobject.CustomerInfo
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID             uint
+	Active         bool
+	Email          *valueobject.Email
+	HashedPassword string
+	CustomerInfo   *valueobject.CustomerInfo
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type Customers []Customer

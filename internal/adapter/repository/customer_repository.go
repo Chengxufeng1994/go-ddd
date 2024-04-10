@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"math"
 
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/repository"
@@ -11,8 +12,8 @@ import (
 )
 
 type GormCustomerRepository struct {
-	customerMapper *CustomerMapper
 	db             *gorm.DB
+	customerMapper *CustomerMapper
 }
 
 func NewGormCustomerRepository(db *gorm.DB) repository.CustomerRepository {
@@ -34,9 +35,19 @@ func (r *GormCustomerRepository) CreateCustomer(ctx context.Context, entity *ent
 }
 
 // ListCustomers implements repository.CustomerRepository.
-func (r *GormCustomerRepository) ListCustomers(ctx context.Context) (entity.Customers, error) {
+func (r *GormCustomerRepository) ListCustomers(ctx context.Context, page repository.PaginationCriteria) (*repository.PaginationResult, error) {
 	var rows []po.Customer
-	err := r.db.WithContext(ctx).Model(&po.Customer{}).Find(&rows).Error
+	err := r.db.WithContext(ctx).Scopes(repository.Pagination(&page)).Model(&po.Customer{}).Find(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	totalRows, err := r.Count(ctx)
+	page.TotalRows = totalRows
+
+	totalPages := int(math.Ceil(float64(totalRows) / float64(page.Limit)))
+	page.TotalPages = totalPages
+
 	if err != nil {
 		return nil, err
 	}
@@ -46,13 +57,43 @@ func (r *GormCustomerRepository) ListCustomers(ctx context.Context) (entity.Cust
 		entities = append(entities, *r.customerMapper.ToDomainEntity(&rows[i]))
 	}
 
-	return entities, nil
+	return &repository.PaginationResult{
+		PaginationCriteria: page,
+		Rows:               entities,
+	}, nil
+}
+
+// Count returns the total of sources.
+func (r *GormCustomerRepository) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.Table("customers").WithContext(ctx).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+// SearchCustomers implements repository.CustomerRepository.
+func (r *GormCustomerRepository) SearchCustomers(context.Context, repository.CustomerSearchCriteria) (*entity.Customers, error) {
+	panic("unimplemented")
 }
 
 // GetCustomer implements repository.CustomerRepository.
 func (r *GormCustomerRepository) GetCustomer(ctx context.Context, id uint) (*entity.Customer, error) {
 	var row po.Customer
 	err := r.db.WithContext(ctx).Model(&po.Customer{}).Where("id = ?", id).First(&row).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return r.customerMapper.ToDomainEntity(&row), nil
+}
+
+// GetCustomerByEmail implements repository.CustomerRepository.
+func (r *GormCustomerRepository) GetCustomerByEmail(ctx context.Context, email string) (*entity.Customer, error) {
+	var row po.Customer
+	err := r.db.WithContext(ctx).Model(&po.Customer{}).Where("email = ?", email).First(&row).Error
 	if err != nil {
 		return nil, err
 	}
