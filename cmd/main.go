@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	dsn := "host=10.1.5.7 user=postgres password=P@ssw0rd dbname=postgres port=31820 sslmode=disable TimeZone=UTC"
+	dsn := "host=localhost user=root password=P@ssw0rd dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
 	db, err := persistence.New(dsn)
 	if err != nil {
 		fmt.Printf("error connecting database: %s\n", err)
@@ -79,46 +79,4 @@ func main() {
 
 	er := <-errc
 	fmt.Printf("exit: %v\n", er)
-
-	// ctx := context.Background()
-	// customerCreationResp1, _ := customerService.CreateCustomer(ctx, &dto.CustomerCreationRequest{
-	// 	Email:     "goddd@example.com",
-	// 	Password:  "password",
-	// 	Age:       30,
-	// 	FirstName: "first",
-	// 	LastName:  "last",
-	// })
-	// fmt.Println(customerCreationResp1)
-
-	// accountCreationResp1, _ := customerService.AddAccountWithCustomer(ctx, &dto.AccountCreationRequest{
-	// 	CustomerID: customerCreationResp1.ID,
-	// 	Amount:     1000,
-	// 	Currency:   "USD",
-	// })
-	// fmt.Println(accountCreationResp1)
-	// customerCreationResp2, _ := customerService.CreateCustomer(ctx, &dto.CustomerCreationRequest{
-	// 	Email:     "goddd_2@example.com",
-	// 	Password:  "password",
-	// 	Age:       30,
-	// 	FirstName: "first",
-	// 	LastName:  "last",
-	// })
-	// fmt.Println(customerCreationResp1)
-
-	// accountCreationResp2, _ := customerService.AddAccountWithCustomer(ctx, &dto.AccountCreationRequest{
-	// 	CustomerID: customerCreationResp2.ID,
-	// 	Amount:     1000,
-	// 	Currency:   "USD",
-	// })
-	// fmt.Println(accountCreationResp2)
-	// customers, err := customerRepository.ListCustomers(ctx, intrepo.PaginationCriteria{Page: 2, Limit: 1})
-	// fmt.Println(customers)
-
-	// res2, _ := accountService.GetAccount(ctx, 1)
-	// res3, _ := accountService.GetAccount(ctx, 2)
-	// transactionService.TransferWithTrx(ctx, &dto.TransferRequest{
-	// 	FromAccountId: res2.ID,
-	// 	ToAccountId:   res3.ID,
-	// 	Amount:        100,
-	// })
 }

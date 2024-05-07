@@ -1,4 +1,12 @@
 definitions:
+  common.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
   dto.AccountResponse:
     properties:
       amount:
@@ -32,9 +40,25 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{}'
           schema:
-            $ref: '#/definitions/dto.AccountResponse'
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AccountResponse'
+                msg:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                msg:
+                  type: string
+              type: object
       summary: Show an account
       tags:
       - accounts
