@@ -7,14 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type CustomerMapper struct{}
+type UserMapper struct{}
 
-func NewCustomMapper() *CustomerMapper {
-	return &CustomerMapper{}
+func NewCustomMapper() *UserMapper {
+	return &UserMapper{}
 }
 
-func (m *CustomerMapper) ToDatabaseModel(entity *entity.Customer) *po.Customer {
-	return &po.Customer{
+func (m *UserMapper) ToDatabaseModel(entity *entity.User) *po.User {
+	return &po.User{
 		Model: gorm.Model{
 			ID:        entity.ID,
 			CreatedAt: entity.CreatedAt,
@@ -29,9 +29,9 @@ func (m *CustomerMapper) ToDatabaseModel(entity *entity.Customer) *po.Customer {
 	}
 }
 
-func (m *CustomerMapper) ToDomainEntity(model *po.Customer) *entity.Customer {
+func (m *UserMapper) ToDomainEntity(model *po.User) *entity.User {
 	email, _ := valueobject.NewEmail(model.Email)
-	return &entity.Customer{
+	return &entity.User{
 		ID:             model.ID,
 		Active:         model.Active,
 		Email:          email,

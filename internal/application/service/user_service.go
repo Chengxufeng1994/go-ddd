@@ -10,33 +10,32 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
 )
 
-type CustomerService struct {
+type UserService struct {
 	customerRepository repository.CustomerRepository
 	accountRepository  repository.AccountRepository
 }
 
-func NewCustomerService(customerRepository repository.CustomerRepository, accountRepository repository.AccountRepository) usecase.CustomerUseCase {
-	return &CustomerService{
+func NewUserService(customerRepository repository.CustomerRepository, accountRepository repository.AccountRepository) usecase.UserUseCase {
+	return &UserService{
 		customerRepository: customerRepository,
 		accountRepository:  accountRepository,
 	}
 }
 
-// CreateCustomer implements usecase.CustomerUseCase.
-func (s *CustomerService) CreateCustomer(ctx context.Context, req *dto.CustomerCreationRequest) (*dto.CustomerCreationResponse, error) {
+func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationRequest) (*dto.UserCreationResponse, error) {
 	email, _ := valueobject.NewEmail(req.Email)
-	entity := &entity.Customer{
+	entity := &entity.User{
 		Email:          email,
 		HashedPassword: req.Password,
 		CustomerInfo:   valueobject.NewCustomerInfo(req.Age, req.FirstName, req.LastName),
 	}
 
-	rcustomer, err := s.customerRepository.CreateCustomer(ctx, entity)
+	rcustomer, err := s.customerRepository.CreateUser(ctx, entity)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.CustomerCreationResponse{
+	return &dto.UserCreationResponse{
 		ID:        rcustomer.ID,
 		Active:    rcustomer.Active,
 		Email:     rcustomer.Email.String(),
@@ -48,14 +47,13 @@ func (s *CustomerService) CreateCustomer(ctx context.Context, req *dto.CustomerC
 	}, nil
 }
 
-// GetCustomer implements usecase.CustomerUseCase.
-func (s *CustomerService) GetCustomer(ctx context.Context, ID uint) (*dto.Customer, error) {
-	rcustomer, err := s.customerRepository.GetCustomer(ctx, ID)
+func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
+	rcustomer, err := s.customerRepository.GetUser(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.Customer{
+	return &dto.User{
 		ID:        rcustomer.ID,
 		Active:    rcustomer.Active,
 		Email:     rcustomer.Email.String(),
@@ -67,16 +65,15 @@ func (s *CustomerService) GetCustomer(ctx context.Context, ID uint) (*dto.Custom
 	}, nil
 }
 
-// SearchCustomers implements usecase.CustomerUseCase.
-func (s *CustomerService) ListCustomers(ctx context.Context) (*[]dto.Customer, error) {
+func (s *UserService) ListUsers(ctx context.Context) (*[]dto.User, error) {
 	criteria := repository.CustomerSearchCriteria{}
-	res, err := s.customerRepository.SearchCustomers(ctx, criteria)
+	res, err := s.customerRepository.SearchUsers(ctx, criteria)
 	if err != nil {
 		return nil, err
 	}
-	dtos := make([]dto.Customer, 0, len(*res))
+	dtos := make([]dto.User, 0, len(*res))
 	for _, cus := range *res {
-		dtos = append(dtos, dto.Customer{
+		dtos = append(dtos, dto.User{
 			ID: cus.ID,
 		})
 	}
@@ -84,17 +81,16 @@ func (s *CustomerService) ListCustomers(ctx context.Context) (*[]dto.Customer, e
 	return &dtos, nil
 }
 
-// AddAccountWithCustomer implements usecase.CustomerUseCase.
-func (s *CustomerService) AddAccountWithCustomer(ctx context.Context, req *dto.AccountCreationRequest) (*dto.AccountCreationResponse, error) {
-	existed, err := s.customerRepository.GetCustomer(ctx, req.CustomerID)
+func (s *UserService) AddAccountWithUser(ctx context.Context, req *dto.AccountCreationRequest) (*dto.AccountCreationResponse, error) {
+	existed, err := s.customerRepository.GetUser(ctx, req.UserID)
 	if existed == nil || err != nil {
 		return nil, err
 	}
 
 	money, _ := valueobject.NewMoney(req.Amount, req.Currency)
 	entity := &entity.Account{
-		CustomerID: req.CustomerID,
-		Money:      money,
+		UserID: req.UserID,
+		Money:  money,
 	}
 
 	raccount, err := s.accountRepository.CreateAccount(ctx, entity)
@@ -103,11 +99,11 @@ func (s *CustomerService) AddAccountWithCustomer(ctx context.Context, req *dto.A
 	}
 
 	return &dto.AccountCreationResponse{
-		ID:         raccount.ID,
-		CustomerID: raccount.CustomerID,
-		Amount:     raccount.Money.Amount(),
-		Currency:   raccount.Money.Currency(),
-		CreatedAt:  raccount.CreatedAt,
-		UpdatedAt:  raccount.UpdatedAt,
+		ID:        raccount.ID,
+		UserID:    raccount.UserID,
+		Amount:    raccount.Money.Amount(),
+		Currency:  raccount.Money.Currency(),
+		CreatedAt: raccount.CreatedAt,
+		UpdatedAt: raccount.UpdatedAt,
 	}, nil
 }

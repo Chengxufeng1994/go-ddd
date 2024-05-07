@@ -7,11 +7,11 @@ import (
 )
 
 type Account struct {
-	ID         uint
-	CustomerID uint
-	Money      *valueobject.Money
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID        uint
+	UserID    uint
+	Money     *valueobject.Money
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type Accounts []Account

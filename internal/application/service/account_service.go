@@ -57,11 +57,11 @@ func (a *AccountService) GetAccount(ctx context.Context, ID uint) (*dto.AccountR
 	}
 
 	return &dto.AccountResponse{
-		ID:         raccount.ID,
-		CustomerID: raccount.CustomerID,
-		Amount:     raccount.Money.Amount(),
-		Currency:   raccount.Money.Currency(),
-		CreatedAt:  raccount.CreatedAt,
-		UpdatedAt:  raccount.UpdatedAt,
+		ID:        raccount.ID,
+		UserID:    raccount.UserID,
+		Amount:    raccount.Money.Amount(),
+		Currency:  raccount.Money.Currency(),
+		CreatedAt: raccount.CreatedAt,
+		UpdatedAt: raccount.UpdatedAt,
 	}, nil
 }

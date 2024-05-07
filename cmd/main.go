@@ -25,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = db.AutoMigrate(&po.Customer{}, &po.Account{}, &po.Transfer{})
+	err = db.AutoMigrate(&po.User{}, &po.Account{}, &po.Transfer{})
 	if err != nil {
 		fmt.Printf("error migrating database: %s\n", err)
 		os.Exit(1)
@@ -39,7 +39,7 @@ func main() {
 	unitOfWorkRepository := repository.New(db)
 
 	accountService := service.NewAccountService(accountRepository, customerRepository)
-	customerService := service.NewCustomerService(customerRepository, accountRepository)
+	customerService := service.NewUserService(customerRepository, accountRepository)
 	transactionService := service.NewTransactionService(transferRepository, accountRepository, unitOfWorkRepository)
 
 	appCfg := &application.ApplicationConfiguration{

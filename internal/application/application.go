@@ -6,13 +6,13 @@ import (
 
 type ApplicationConfiguration struct {
 	AccountService     usecase.AccountUseCase
-	CustomerService    usecase.CustomerUseCase
+	CustomerService    usecase.UserUseCase
 	TransactionService usecase.TransactionUseCase
 }
 
 type Application struct {
 	AccountService     usecase.AccountUseCase
-	CustomerService    usecase.CustomerUseCase
+	CustomerService    usecase.UserUseCase
 	TransactionService usecase.TransactionUseCase
 }
 

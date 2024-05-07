@@ -20,19 +20,19 @@ func (m *AccountMapper) ToDatabaseModel(entity *entity.Account) *po.Account {
 			CreatedAt: entity.CreatedAt,
 			UpdatedAt: entity.UpdatedAt,
 		},
-		CustomerID: entity.CustomerID,
-		Amount:     entity.Money.Amount(),
-		Currency:   entity.Money.Currency(),
+		UserID:   entity.UserID,
+		Amount:   entity.Money.Amount(),
+		Currency: entity.Money.Currency(),
 	}
 }
 
 func (m *AccountMapper) ToDomainEntity(model *po.Account) *entity.Account {
 	money, _ := valueobject.NewMoney(model.Amount, model.Currency)
 	return &entity.Account{
-		ID:         model.ID,
-		CustomerID: model.CustomerID,
-		Money:      money,
-		CreatedAt:  model.CreatedAt,
-		UpdatedAt:  model.UpdatedAt,
+		ID:        model.ID,
+		UserID:    model.UserID,
+		Money:     money,
+		CreatedAt: model.CreatedAt,
+		UpdatedAt: model.UpdatedAt,
 	}
 }

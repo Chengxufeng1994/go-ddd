@@ -2,7 +2,7 @@ package po
 
 import "gorm.io/gorm"
 
-type Customer struct {
+type User struct {
 	gorm.Model
 	Active         bool   `gorm:"default:true"`
 	Email          string `gorm:"type:varchar(320);unique;not null"`
@@ -12,5 +12,5 @@ type Customer struct {
 	LastName       string `gorm:"type:varchar(50);not null"`
 	// Address        string    `gorm:"type:text;not null"`
 	// PhoneNumber    string    `gorm:"type:varchar(20);unique;not null"`
-	Accounts []Account `gorm:"foreignKey:CustomerID;references:ID"`
+	Accounts []Account `gorm:"foreignKey:UserID;references:ID"`
 }

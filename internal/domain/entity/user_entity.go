@@ -6,7 +6,7 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
 )
 
-type Customer struct {
+type User struct {
 	ID             uint
 	Active         bool
 	Email          *valueobject.Email
@@ -16,4 +16,4 @@ type Customer struct {
 	UpdatedAt      time.Time
 }
 
-type Customers []Customer
+type Users []User
