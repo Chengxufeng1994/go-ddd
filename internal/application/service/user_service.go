@@ -11,14 +11,14 @@ import (
 )
 
 type UserService struct {
-	customerRepository repository.CustomerRepository
-	accountRepository  repository.AccountRepository
+	userRepository    repository.UserRepository
+	accountRepository repository.AccountRepository
 }
 
-func NewUserService(customerRepository repository.CustomerRepository, accountRepository repository.AccountRepository) usecase.UserUseCase {
+func NewUserService(customerRepository repository.UserRepository, accountRepository repository.AccountRepository) usecase.UserUseCase {
 	return &UserService{
-		customerRepository: customerRepository,
-		accountRepository:  accountRepository,
+		userRepository:    customerRepository,
+		accountRepository: accountRepository,
 	}
 }
 
@@ -27,10 +27,10 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 	entity := &entity.User{
 		Email:          email,
 		HashedPassword: req.Password,
-		CustomerInfo:   valueobject.NewCustomerInfo(req.Age, req.FirstName, req.LastName),
+		UserInfo:       valueobject.NewCustomerInfo(req.Age, req.FirstName, req.LastName),
 	}
 
-	rcustomer, err := s.customerRepository.CreateUser(ctx, entity)
+	rcustomer, err := s.userRepository.CreateUser(ctx, entity)
 	if err != nil {
 		return nil, err
 	}
@@ -39,16 +39,16 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 		ID:        rcustomer.ID,
 		Active:    rcustomer.Active,
 		Email:     rcustomer.Email.String(),
-		Age:       rcustomer.CustomerInfo.Age(),
-		FirstName: rcustomer.CustomerInfo.FirstName(),
-		LastName:  rcustomer.CustomerInfo.LastName(),
+		Age:       rcustomer.UserInfo.Age(),
+		FirstName: rcustomer.UserInfo.FirstName(),
+		LastName:  rcustomer.UserInfo.LastName(),
 		CreatedAt: rcustomer.CreatedAt,
 		UpdatedAt: rcustomer.UpdatedAt,
 	}, nil
 }
 
 func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
-	rcustomer, err := s.customerRepository.GetUser(ctx, ID)
+	rcustomer, err := s.userRepository.GetUser(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +57,9 @@ func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
 		ID:        rcustomer.ID,
 		Active:    rcustomer.Active,
 		Email:     rcustomer.Email.String(),
-		Age:       rcustomer.CustomerInfo.Age(),
-		FirstName: rcustomer.CustomerInfo.FirstName(),
-		LastName:  rcustomer.CustomerInfo.LastName(),
+		Age:       rcustomer.UserInfo.Age(),
+		FirstName: rcustomer.UserInfo.FirstName(),
+		LastName:  rcustomer.UserInfo.LastName(),
 		CreatedAt: rcustomer.CreatedAt,
 		UpdatedAt: rcustomer.UpdatedAt,
 	}, nil
@@ -67,7 +67,7 @@ func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
 
 func (s *UserService) ListUsers(ctx context.Context) (*[]dto.User, error) {
 	criteria := repository.CustomerSearchCriteria{}
-	res, err := s.customerRepository.SearchUsers(ctx, criteria)
+	res, err := s.userRepository.SearchUsers(ctx, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (s *UserService) ListUsers(ctx context.Context) (*[]dto.User, error) {
 }
 
 func (s *UserService) AddAccountWithUser(ctx context.Context, req *dto.AccountCreationRequest) (*dto.AccountCreationResponse, error) {
-	existed, err := s.customerRepository.GetUser(ctx, req.UserID)
+	existed, err := s.userRepository.GetUser(ctx, req.UserID)
 	if existed == nil || err != nil {
 		return nil, err
 	}

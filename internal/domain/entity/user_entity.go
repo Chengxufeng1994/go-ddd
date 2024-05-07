@@ -11,9 +11,11 @@ type User struct {
 	Active         bool
 	Email          *valueobject.Email
 	HashedPassword string
-	CustomerInfo   *valueobject.CustomerInfo
+	UserInfo       *valueobject.CustomerInfo
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	RoleID         uint
+	Roles          []Role
 }
 
 type Users []User

@@ -10,7 +10,7 @@ type CustomerSearchCriteria struct {
 	Age int
 }
 
-type CustomerRepository interface {
+type UserRepository interface {
 	ListUsers(context.Context, PaginationCriteria) (*PaginationResult, error)
 	SearchUsers(context.Context, CustomerSearchCriteria) (*entity.Users, error)
 	GetUser(context.Context, uint) (*entity.User, error)

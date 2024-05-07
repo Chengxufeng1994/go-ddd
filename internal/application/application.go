@@ -6,20 +6,20 @@ import (
 
 type ApplicationConfiguration struct {
 	AccountService     usecase.AccountUseCase
-	CustomerService    usecase.UserUseCase
+	UserService        usecase.UserUseCase
 	TransactionService usecase.TransactionUseCase
 }
 
 type Application struct {
 	AccountService     usecase.AccountUseCase
-	CustomerService    usecase.UserUseCase
+	UserService        usecase.UserUseCase
 	TransactionService usecase.TransactionUseCase
 }
 
 func NewApplication(appCfg *ApplicationConfiguration) *Application {
 	return &Application{
 		AccountService:     appCfg.AccountService,
-		CustomerService:    appCfg.CustomerService,
+		UserService:        appCfg.UserService,
 		TransactionService: appCfg.TransactionService,
 	}
 }

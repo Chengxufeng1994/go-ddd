@@ -9,14 +9,14 @@ import (
 )
 
 type AccountService struct {
-	accountRepository  repository.AccountRepository
-	customerRepository repository.CustomerRepository
+	accountRepository repository.AccountRepository
+	userRepository    repository.UserRepository
 }
 
-func NewAccountService(accountRepository repository.AccountRepository, customerRepository repository.CustomerRepository) usecase.AccountUseCase {
+func NewAccountService(accountRepository repository.AccountRepository, customerRepository repository.UserRepository) usecase.AccountUseCase {
 	return &AccountService{
-		accountRepository:  accountRepository,
-		customerRepository: customerRepository,
+		accountRepository: accountRepository,
+		userRepository:    customerRepository,
 	}
 }
 

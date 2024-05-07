@@ -11,19 +11,19 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type GormCustomerRepository struct {
+type GormUserRepository struct {
 	db         *gorm.DB
 	userMapper *UserMapper
 }
 
-func NewGormCustomerRepository(db *gorm.DB) repository.CustomerRepository {
-	return &GormCustomerRepository{
+func NewGormUserRepository(db *gorm.DB) repository.UserRepository {
+	return &GormUserRepository{
 		db:         db,
-		userMapper: NewCustomMapper(),
+		userMapper: NewUserMapper(),
 	}
 }
 
-func (r *GormCustomerRepository) CreateUser(ctx context.Context, entity *entity.User) (*entity.User, error) {
+func (r *GormUserRepository) CreateUser(ctx context.Context, entity *entity.User) (*entity.User, error) {
 	model := r.userMapper.ToDatabaseModel(entity)
 	err := r.db.WithContext(ctx).Model(&po.User{}).Create(model).Error
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *GormCustomerRepository) CreateUser(ctx context.Context, entity *entity.
 	return r.userMapper.ToDomainEntity(model), nil
 }
 
-func (r *GormCustomerRepository) ListUsers(ctx context.Context, page repository.PaginationCriteria) (*repository.PaginationResult, error) {
+func (r *GormUserRepository) ListUsers(ctx context.Context, page repository.PaginationCriteria) (*repository.PaginationResult, error) {
 	var rows []po.User
 	err := r.db.WithContext(ctx).Scopes(repository.Pagination(&page)).Model(&po.User{}).Find(&rows).Error
 	if err != nil {
@@ -61,7 +61,7 @@ func (r *GormCustomerRepository) ListUsers(ctx context.Context, page repository.
 	}, nil
 }
 
-func (r *GormCustomerRepository) Count(ctx context.Context) (int64, error) {
+func (r *GormUserRepository) Count(ctx context.Context) (int64, error) {
 	var count int64
 	err := r.db.Table("customers").WithContext(ctx).Count(&count).Error
 	if err != nil {
@@ -71,11 +71,11 @@ func (r *GormCustomerRepository) Count(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func (r *GormCustomerRepository) SearchUsers(context.Context, repository.CustomerSearchCriteria) (*entity.Users, error) {
+func (r *GormUserRepository) SearchUsers(context.Context, repository.CustomerSearchCriteria) (*entity.Users, error) {
 	panic("unimplemented")
 }
 
-func (r *GormCustomerRepository) GetUser(ctx context.Context, id uint) (*entity.User, error) {
+func (r *GormUserRepository) GetUser(ctx context.Context, id uint) (*entity.User, error) {
 	var row po.User
 	err := r.db.WithContext(ctx).Model(&po.User{}).Where("id = ?", id).First(&row).Error
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *GormCustomerRepository) GetUser(ctx context.Context, id uint) (*entity.
 	return r.userMapper.ToDomainEntity(&row), nil
 }
 
-func (r *GormCustomerRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (r *GormUserRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var row po.User
 	err := r.db.WithContext(ctx).Model(&po.User{}).Where("email = ?", email).First(&row).Error
 	if err != nil {
@@ -95,7 +95,7 @@ func (r *GormCustomerRepository) GetUserByEmail(ctx context.Context, email strin
 	return r.userMapper.ToDomainEntity(&row), nil
 }
 
-func (r *GormCustomerRepository) UpdateUser(ctx context.Context, id uint, entity *entity.User) (*entity.User, error) {
+func (r *GormUserRepository) UpdateUser(ctx context.Context, id uint, entity *entity.User) (*entity.User, error) {
 	model := r.userMapper.ToDatabaseModel(entity)
 	err := r.db.WithContext(ctx).Clauses(clause.Returning{}).Model(&po.User{}).Where("id = ?", id).Updates(model).Error
 	if err != nil {
@@ -105,7 +105,7 @@ func (r *GormCustomerRepository) UpdateUser(ctx context.Context, id uint, entity
 	return r.userMapper.ToDomainEntity(model), nil
 }
 
-func (r *GormCustomerRepository) DeleteUser(ctx context.Context, id uint) (*entity.User, error) {
+func (r *GormUserRepository) DeleteUser(ctx context.Context, id uint) (*entity.User, error) {
 	model := &po.User{}
 	model.ID = uint(id)
 	err := r.db.WithContext(ctx).Clauses(clause.Returning{}).Model(&po.User{}).Delete(model).Error

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	nethttp "net/http"
@@ -12,6 +13,9 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/adapter/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/application"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/service"
+	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
+	domainrepository "github.com/Chengxufeng1994/go-ddd/internal/domain/repository"
+	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/po"
 	"github.com/Chengxufeng1994/go-ddd/internal/transport/http"
@@ -25,7 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = db.AutoMigrate(&po.User{}, &po.Account{}, &po.Transfer{})
+	err = db.AutoMigrate(&po.User{}, &po.Role{}, &po.UserRole{}, &po.Permission{}, &po.RolePermission{}, &po.Account{}, &po.Transfer{})
 	if err != nil {
 		fmt.Printf("error migrating database: %s\n", err)
 		os.Exit(1)
@@ -33,26 +37,30 @@ func main() {
 
 	errc := make(chan error, 1)
 
-	customerRepository := repository.NewGormCustomerRepository(db)
+	userRepository := repository.NewGormUserRepository(db)
+	roleRepository := repository.NewGormRoleRepository(db)
+	permissionRepository := repository.NewGormPermissionRepository(db)
 	accountRepository := repository.NewGormAccountRepository(db)
 	transferRepository := repository.NewGormTransferRepository(db)
 	unitOfWorkRepository := repository.New(db)
+	RoleSeeds(roleRepository)
+	PermissionSeeds(permissionRepository)
+	AssignPermissionsSeeds(permissionRepository)
+	UserSeeds(userRepository)
 
-	accountService := service.NewAccountService(accountRepository, customerRepository)
-	customerService := service.NewUserService(customerRepository, accountRepository)
+	accountService := service.NewAccountService(accountRepository, userRepository)
+	userService := service.NewUserService(userRepository, accountRepository)
 	transactionService := service.NewTransactionService(transferRepository, accountRepository, unitOfWorkRepository)
 
 	appCfg := &application.ApplicationConfiguration{
 		AccountService:     accountService,
-		CustomerService:    customerService,
+		UserService:        userService,
 		TransactionService: transactionService,
 	}
 	app := application.NewApplication(appCfg)
 
 	ctrl := controller.NewController(app)
-
 	router := http.NewRouter(ctrl)
-
 	httpSrv := http.NewHttpServer(router)
 
 	go func() {
@@ -79,4 +87,81 @@ func main() {
 
 	er := <-errc
 	fmt.Printf("exit: %v\n", er)
+}
+
+func RoleSeeds(repo domainrepository.RoleRepository) {
+	roles := []*entity.Role{
+		{
+			Name: "super-admin",
+			Slug: "super-admin",
+		},
+		{
+			Name: "admin",
+			Slug: "admin",
+		},
+		{
+			Name: "guest",
+			Slug: "guest",
+		},
+	}
+
+	for _, role := range roles {
+		repo.CreateRole(context.Background(), role)
+	}
+}
+
+func PermissionSeeds(repo domainrepository.PermissionRepository) {
+	permissions := []*entity.Permission{
+		{
+			Name: "GET:Hello",
+			Slug: "get hello",
+		},
+		{
+			Name: "GET:Account",
+			Slug: "get account",
+		},
+	}
+
+	for _, perm := range permissions {
+		repo.CreatePermission(context.Background(), perm)
+	}
+}
+
+func AssignPermissionsSeeds(repo domainrepository.PermissionRepository) {
+	repo.AssignPermissionsToRole(context.Background(), 1, []uint{1, 2})
+	repo.AssignPermissionsToRole(context.Background(), 2, []uint{1})
+}
+
+func UserSeeds(repo domainrepository.UserRepository) {
+
+	users := []*entity.User{
+		{
+			Active:         true,
+			Email:          valueobject.MustNewEmail("super_admin@example.com"),
+			HashedPassword: "P@ssw0rd",
+			UserInfo:       valueobject.NewCustomerInfo(30, "super", "admin"),
+			RoleID:         1,
+			Roles: []entity.Role{
+				{
+					ID: 1,
+				},
+			},
+		},
+		{
+			Active:         true,
+			Email:          valueobject.MustNewEmail("guest@example.com"),
+			HashedPassword: "P@ssw0rd",
+			UserInfo:       valueobject.NewCustomerInfo(30, "guest", "guest"),
+			RoleID:         2,
+			Roles: []entity.Role{
+				{
+					ID: 2,
+				},
+			},
+		},
+	}
+
+	for _, u := range users {
+		repo.CreateUser(context.Background(), u)
+	}
 }
