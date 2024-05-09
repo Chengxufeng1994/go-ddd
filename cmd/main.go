@@ -46,6 +46,7 @@ func main() {
 	userRepository := repository.NewGormUserRepository(db)
 	roleRepository := repository.NewGormRoleRepository(db)
 	permissionRepository := repository.NewGormPermissionRepository(db)
+	// rbacRepository := repository.NewRBACRepository(db)
 	accountRepository := repository.NewGormAccountRepository(db)
 	transferRepository := repository.NewGormTransferRepository(db)
 	unitOfWorkRepository := repository.New(db)

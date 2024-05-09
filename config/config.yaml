@@ -1,3 +1,11 @@
+log:
+  level: info
+
+general:
+  app_name: "go-ddd"
+  version: "0.0.1"
+  debug: true
+
 transport:
   http:
     host: 0.0.0.0
