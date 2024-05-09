@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Chengxufeng1994/go-ddd/config"
 	"github.com/Chengxufeng1994/go-ddd/internal/adapter/controller"
 	"github.com/Chengxufeng1994/go-ddd/internal/adapter/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/application"
@@ -22,8 +23,13 @@ import (
 )
 
 func main() {
-	dsn := "host=localhost user=root password=P@ssw0rd dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	db, err := persistence.New(dsn)
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Printf("error load configuration: %s\n", err)
+		os.Exit(1)
+	}
+
+	db, err := persistence.New(&cfg.Infrastructure.Persistence)
 	if err != nil {
 		fmt.Printf("error connecting database: %s\n", err)
 		os.Exit(1)
@@ -61,7 +67,7 @@ func main() {
 
 	ctrl := controller.NewController(app)
 	router := http.NewRouter(ctrl)
-	httpSrv := http.NewHttpServer(router)
+	httpSrv := http.NewHttpServer(&cfg.Transport, router)
 
 	go func() {
 		err := httpSrv.ListenAndServe()

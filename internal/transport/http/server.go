@@ -1,8 +1,10 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/Chengxufeng1994/go-ddd/config"
 	docs "github.com/Chengxufeng1994/go-ddd/docs"
 	"github.com/Chengxufeng1994/go-ddd/internal/adapter/controller"
 	"github.com/gin-contrib/cors"
@@ -26,9 +28,10 @@ func NewRouter(controller *controller.Controller) *gin.Engine {
 	return router
 }
 
-func NewHttpServer(engine *gin.Engine) *http.Server {
+func NewHttpServer(cfg *config.Transport, engine *gin.Engine) *http.Server {
+	addr := fmt.Sprintf("%s:%d", cfg.HTTP.Host, cfg.HTTP.Port)
 	srv := &http.Server{
-		Addr:    ":3030",
+		Addr:    addr,
 		Handler: engine,
 	}
 

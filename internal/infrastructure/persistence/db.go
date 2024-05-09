@@ -1,19 +1,17 @@
 package persistence
 
 import (
-	"gorm.io/driver/postgres"
+	"fmt"
+
+	"github.com/Chengxufeng1994/go-ddd/config"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func New(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(dsn),
-		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
-		})
-	if err != nil {
-		return nil, err
+func New(cfg *config.Persistence) (*gorm.DB, error) {
+	switch cfg.Type {
+	case "postgres":
+		return NewPgGorm(&cfg.Postgres)
+	default:
+		return nil, fmt.Errorf("unknown database type")
 	}
-
-	return db, nil
 }
