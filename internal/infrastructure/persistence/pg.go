@@ -13,12 +13,13 @@ import (
 )
 
 func NewPgGorm(cfg *config.Postgres) (*gorm.DB, error) {
-	_default := logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
-		SlowThreshold: 200 * time.Millisecond,
-		// LogLevel:      logger.Warn,
-		LogLevel: logger.Info,
-		Colorful: true,
-	})
+	_default := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second, // Slow SQL threshold
+			LogLevel:      logger.Info, // Log level
+			Colorful:      true,        // Disable color
+		})
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName)
 	pgCfg := postgres.Config{

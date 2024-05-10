@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/Chengxufeng1994/go-ddd/dto"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/dto"
 )
 
 type UserUseCase interface {

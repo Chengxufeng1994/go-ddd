@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Chengxufeng1994/go-ddd/dto"
-	adapter_repo "github.com/Chengxufeng1994/go-ddd/internal/adapter/repository"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/dto"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/usecase"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
+	infra_repository "github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/repository"
 )
 
 type TransactionService struct {
 	trxRepository     repository.TransferRepository
 	accountRepository repository.AccountRepository
-	unitOfWork        adapter_repo.UnitOfWork
+	unitOfWork        infra_repository.UnitOfWork
 }
 
-func NewTransactionService(trxRepository repository.TransferRepository, accountRepository repository.AccountRepository, unitOfWork adapter_repo.UnitOfWork) usecase.TransactionUseCase {
+func NewTransactionService(trxRepository repository.TransferRepository, accountRepository repository.AccountRepository, unitOfWork infra_repository.UnitOfWork) usecase.TransactionUseCase {
 	return &TransactionService{
 		trxRepository:     trxRepository,
 		accountRepository: accountRepository,
@@ -84,7 +84,7 @@ func (s *TransactionService) TransferWithTrx(ctx context.Context, req *dto.Trans
 	var rFromAccount *entity.Account
 	var rToAccount *entity.Account
 
-	fn := func(store adapter_repo.IUnitOfWorkStore) error {
+	fn := func(store infra_repository.IUnitOfWorkStore) error {
 		store.Transfer().CreateTransfer(ctx, &entity.Transfer{
 			FromAccountId: req.FromAccountId,
 			ToAccountId:   req.ToAccountId,

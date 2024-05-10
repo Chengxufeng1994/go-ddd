@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/Chengxufeng1994/go-ddd/dto"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/dto"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/usecase"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/repository"

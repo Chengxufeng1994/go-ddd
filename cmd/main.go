@@ -10,8 +10,6 @@ import (
 	"syscall"
 
 	"github.com/Chengxufeng1994/go-ddd/config"
-	"github.com/Chengxufeng1994/go-ddd/internal/adapter/controller"
-	"github.com/Chengxufeng1994/go-ddd/internal/adapter/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/application"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/service"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
@@ -19,7 +17,11 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/po"
+	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/transport/http"
+	"github.com/Chengxufeng1994/go-ddd/internal/transport/http/controller"
+	"github.com/casbin/casbin/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 )
 
 func main() {
@@ -39,6 +41,23 @@ func main() {
 	if err != nil {
 		fmt.Printf("error migrating database: %s\n", err)
 		os.Exit(1)
+	}
+
+	// Initialize  casbin adapter
+	adapter, err := gormadapter.NewAdapterByDB(db)
+	if err != nil {
+		panic(fmt.Sprintf("failed to initialize casbin adapter: %v", err))
+	}
+	enforcer, _ := casbin.NewEnforcer("config/model.conf", adapter)
+	//add policy
+	if hasPolicy, _ := enforcer.HasPolicy("system-admin", "accounts", "write"); !hasPolicy {
+		enforcer.AddPolicy("system-admin", "accounts", "write")
+	}
+	if hasPolicy, _ := enforcer.HasPolicy("system-admin", "accounts", "read"); !hasPolicy {
+		enforcer.AddPolicy("system-admin", "accounts", "read")
+	}
+	if hasPolicy, _ := enforcer.HasPolicy("admin", "accounts", "read"); !hasPolicy {
+		enforcer.AddPolicy("admin", "accounts", "read")
 	}
 
 	errc := make(chan error, 1)
@@ -67,7 +86,7 @@ func main() {
 	app := application.NewApplication(appCfg)
 
 	ctrl := controller.NewController(app)
-	router := http.NewRouter(ctrl)
+	router := http.NewRouter(enforcer, ctrl)
 	httpSrv := http.NewHttpServer(&cfg.Transport, router)
 
 	go func() {

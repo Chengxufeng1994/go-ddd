@@ -1,0 +1,14 @@
+apiVersion: skaffold/v4beta10
+kind: Config
+metadata:
+  name: go-ddd
+build:
+  artifacts:
+    - image: go-ddd
+      context: .
+      docker:
+        dockerfile: Dockerfile.dev
+manifests:
+  rawYaml:
+    - deploy/k8s/deployment.yaml
+    - deploy/k8s/service.yaml

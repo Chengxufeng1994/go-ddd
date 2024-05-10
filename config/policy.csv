@@ -1,0 +1,5 @@
+p, system-admin, accounts, write
+p, system-admin, accounts, read
+p, admin, accounts, read
+
+g, alice, system-admin

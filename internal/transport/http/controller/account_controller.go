@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Chengxufeng1994/go-ddd/dto/common"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/dto/common"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/usecase"
 	"github.com/gin-gonic/gin"
 )
