@@ -27,7 +27,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 	entity := &entity.User{
 		Email:          email,
 		HashedPassword: req.Password,
-		UserInfo:       valueobject.NewCustomerInfo(req.Age, req.FirstName, req.LastName),
+		UserInfo:       valueobject.NewUserInfo(req.Age, req.FirstName, req.LastName),
 	}
 
 	rcustomer, err := s.userRepository.CreateUser(ctx, entity)
@@ -66,7 +66,7 @@ func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
 }
 
 func (s *UserService) ListUsers(ctx context.Context) (*[]dto.User, error) {
-	criteria := repository.CustomerSearchCriteria{}
+	criteria := repository.UserSearchCriteria{}
 	res, err := s.userRepository.SearchUsers(ctx, criteria)
 	if err != nil {
 		return nil, err

@@ -71,7 +71,7 @@ func (r *GormUserRepository) Count(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func (r *GormUserRepository) SearchUsers(context.Context, repository.CustomerSearchCriteria) (*entity.Users, error) {
+func (r *GormUserRepository) SearchUsers(context.Context, repository.UserSearchCriteria) (*entity.Users, error) {
 	panic("unimplemented")
 }
 

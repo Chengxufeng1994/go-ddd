@@ -1,9 +1,26 @@
-.PHONY: postgres run swagger
+.PHONY: network postgres pgadmin run-server swagger
+
+network:
+	@docker network create go-ddd
 
 postgres:
-	docker run --name postgres  -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=P@ssw0rd -d postgres:latest
+	@docker run --network go-ddd \
+		--name postgres \
+		-p 5432:5432 \
+		-e POSTGRES_USER=root \
+		-e POSTGRES_PASSWORD=P@ssw0rd \
+		-e POSTGRES_DB=postgres \
+		-d postgres:latest
 
-run:
+pgadmin:
+	@docker run --network go-ddd \
+		--name pgadmin \
+		-p 5050:80 \
+		-e "PGADMIN_DEFAULT_EMAIL=root@example.com" \
+    -e "PGADMIN_DEFAULT_PASSWORD=P@ssw0rd" \
+		-d dpage/pgadmin4:latest
+
+run-server:
 	@go run ./cmd/main.go
 
 swagger:

@@ -8,6 +8,7 @@
 4. aggregate
 5. rich domain vs. anemic domain
 6. repository pattern
+7. unit of work pattern
 
 ## Reference
 

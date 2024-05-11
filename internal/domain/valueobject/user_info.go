@@ -6,33 +6,33 @@ import (
 	"regexp"
 )
 
-type CustomerInfo struct {
+type UserInfo struct {
 	age       int
 	firstName string
 	lastName  string
 }
 
-func NewCustomerInfo(age int, firstName, lastName string) *CustomerInfo {
-	return &CustomerInfo{
+func NewUserInfo(age int, firstName, lastName string) *UserInfo {
+	return &UserInfo{
 		age:       age,
 		firstName: firstName,
 		lastName:  lastName,
 	}
 }
 
-func (ci CustomerInfo) FullName() string {
+func (ci UserInfo) FullName() string {
 	return fmt.Sprintf("%s %s", ci.firstName, ci.lastName)
 }
 
-func (ci CustomerInfo) FirstName() string {
+func (ci UserInfo) FirstName() string {
 	return ci.firstName
 }
 
-func (ci CustomerInfo) LastName() string {
+func (ci UserInfo) LastName() string {
 	return ci.lastName
 }
 
-func (ci CustomerInfo) Age() int {
+func (ci UserInfo) Age() int {
 	return ci.age
 }
 

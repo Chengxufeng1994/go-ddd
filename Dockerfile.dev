@@ -1,15 +1,21 @@
 FROM golang:1.22.2 AS build-stage
+ENV GOCACHE=/go/pkg/mod
+ENV GOMODCACHE=/gomod_cache
+
+RUN go env -w GOCACHE=$GOCACHE
+RUN go env -w GOMODCACHE=$GOMODCACHE
 
 WORKDIR /usr/local/app
 
 COPY go.mod go.sum ./
 RUN go mod tidy
-RUN go mod download
+RUN --mount=type=cache,mode=0755,target=/go/pkg/mod go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix -ldflags="-s -w" -o main ./cmd/main.go
+RUN --mount=type=cache,target=/gomod_cache CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/main.go
 
 FROM alpine:latest
+ENV GOTRACEBACK=single
 
 WORKDIR /usr/local/app
 

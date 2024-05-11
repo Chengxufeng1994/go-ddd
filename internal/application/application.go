@@ -5,21 +5,24 @@ import (
 )
 
 type ApplicationConfiguration struct {
-	AccountService     usecase.AccountUseCase
+	AuthService        usecase.AuthUseCase
 	UserService        usecase.UserUseCase
+	AccountService     usecase.AccountUseCase
 	TransactionService usecase.TransactionUseCase
 }
 
 type Application struct {
-	AccountService     usecase.AccountUseCase
+	AuthService        usecase.AuthUseCase
 	UserService        usecase.UserUseCase
+	AccountService     usecase.AccountUseCase
 	TransactionService usecase.TransactionUseCase
 }
 
 func NewApplication(appCfg *ApplicationConfiguration) *Application {
 	return &Application{
-		AccountService:     appCfg.AccountService,
+		AuthService:        appCfg.AuthService,
 		UserService:        appCfg.UserService,
+		AccountService:     appCfg.AccountService,
 		TransactionService: appCfg.TransactionService,
 	}
 }

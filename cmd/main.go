@@ -15,7 +15,7 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
 	domainrepository "github.com/Chengxufeng1994/go-ddd/internal/domain/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/valueobject"
-	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence"
+	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/database"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/po"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/transport/http"
@@ -31,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	db, err := persistence.New(&cfg.Infrastructure.Persistence)
+	db, err := database.New(&cfg.Infrastructure.Persistence)
 	if err != nil {
 		fmt.Printf("error connecting database: %s\n", err)
 		os.Exit(1)
@@ -53,6 +53,7 @@ func main() {
 	if hasPolicy, _ := enforcer.HasPolicy("system-admin", "accounts", "write"); !hasPolicy {
 		enforcer.AddPolicy("system-admin", "accounts", "write")
 	}
+
 	if hasPolicy, _ := enforcer.HasPolicy("system-admin", "accounts", "read"); !hasPolicy {
 		enforcer.AddPolicy("system-admin", "accounts", "read")
 	}
@@ -74,11 +75,13 @@ func main() {
 	AssignPermissionsSeeds(permissionRepository)
 	UserSeeds(userRepository)
 
-	accountService := service.NewAccountService(accountRepository, userRepository)
+	authService := service.NewAuthService(userRepository)
 	userService := service.NewUserService(userRepository, accountRepository)
+	accountService := service.NewAccountService(accountRepository, userRepository)
 	transactionService := service.NewTransactionService(transferRepository, accountRepository, unitOfWorkRepository)
 
 	appCfg := &application.ApplicationConfiguration{
+		AuthService:        authService,
 		AccountService:     accountService,
 		UserService:        userService,
 		TransactionService: transactionService,
@@ -165,7 +168,7 @@ func UserSeeds(repo domainrepository.UserRepository) {
 			Active:         true,
 			Email:          valueobject.MustNewEmail("super_admin@example.com"),
 			HashedPassword: "P@ssw0rd",
-			UserInfo:       valueobject.NewCustomerInfo(30, "super", "admin"),
+			UserInfo:       valueobject.NewUserInfo(30, "super", "admin"),
 			RoleID:         1,
 			Roles: []entity.Role{
 				{
@@ -177,11 +180,11 @@ func UserSeeds(repo domainrepository.UserRepository) {
 			Active:         true,
 			Email:          valueobject.MustNewEmail("guest@example.com"),
 			HashedPassword: "P@ssw0rd",
-			UserInfo:       valueobject.NewCustomerInfo(30, "guest", "guest"),
-			RoleID:         2,
+			UserInfo:       valueobject.NewUserInfo(30, "guest", "guest"),
+			RoleID:         3,
 			Roles: []entity.Role{
 				{
-					ID: 2,
+					ID: 3,
 				},
 			},
 		},

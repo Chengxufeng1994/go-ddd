@@ -15,12 +15,28 @@ definitions:
         type: string
       currency:
         type: string
-      customer_id:
-        type: integer
       id:
         type: integer
       updated_at:
         type: string
+      user_id:
+        type: integer
+    type: object
+  dto.SignUpRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
     type: object
 info:
   contact: {}
@@ -40,7 +56,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{}'
+          description: OK
           schema:
             allOf:
             - $ref: '#/definitions/common.Response'
@@ -53,12 +69,7 @@ paths:
         "404":
           description: Not Found
           schema:
-            allOf:
-            - $ref: '#/definitions/common.Response'
-            - properties:
-                msg:
-                  type: string
-              type: object
+            $ref: '#/definitions/common.Response'
       summary: Show an account
       tags:
       - accounts
@@ -77,4 +88,37 @@ paths:
       summary: ping example
       tags:
       - example
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: registers a user
+      parameters:
+      - description: register a user
+        in: body
+        name: signupRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AccountResponse'
+                msg:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: registers a user
+      tags:
+      - authenticate
 swagger: "2.0"

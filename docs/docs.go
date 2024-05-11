@@ -40,7 +40,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{}",
+                        "description": "OK",
                         "schema": {
                             "allOf": [
                                 {
@@ -63,19 +63,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/common.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "msg": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/common.Response"
                         }
                     }
                 }
@@ -99,6 +87,61 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup": {
+            "post": {
+                "description": "registers a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authenticate"
+                ],
+                "summary": "registers a user",
+                "parameters": [
+                    {
+                        "description": "register a user",
+                        "name": "signupRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AccountResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
                         }
                     }
                 }
@@ -130,13 +173,36 @@ const docTemplate = `{
                 "currency": {
                     "type": "string"
                 },
-                "customer_id": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SignUpRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }

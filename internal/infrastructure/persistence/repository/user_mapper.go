@@ -57,7 +57,7 @@ func (m *UserMapper) ToDomainEntity(model *po.User) *entity.User {
 		Active:         model.Active,
 		Email:          email,
 		HashedPassword: model.HashedPassword,
-		UserInfo:       valueobject.NewCustomerInfo(model.Age, model.FirstName, model.LastName),
+		UserInfo:       valueobject.NewUserInfo(model.Age, model.FirstName, model.LastName),
 		CreatedAt:      model.CreatedAt,
 		UpdatedAt:      model.UpdatedAt,
 		RoleID:         model.RoleID,

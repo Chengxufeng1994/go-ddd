@@ -24,7 +24,9 @@ func NewRouter(enforcer *casbin.Enforcer, controller *controller.Controller) *gi
 	apiv1.Use(middleware.CORSMiddleware())
 	{
 		apiv1.GET("/hello", controller.HelloController.SayHello)
-		apiv1.GET("/accounts/:account_id", middleware.AuthorizeMiddleware(enforcer), controller.AccountController.Get)
+		apiv1.POST("/signup", controller.AuthController.SignUp)
+		apiv1.POST("/signin", controller.AuthController.SignIn)
+		apiv1.POST("/signout", controller.AuthController.SignOut)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
