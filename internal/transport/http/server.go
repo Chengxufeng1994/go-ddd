@@ -32,6 +32,12 @@ func NewRouter(enforcer *casbin.Enforcer, controller *controller.Controller) *gi
 		apiv1.POST("/signout", controller.AuthController.SignOut)
 	}
 
+	userGroup := apiv1.Group("/users")
+	{
+		userGroup.GET("", controller.UserController.Query)
+		userGroup.GET("/:id", controller.UserController.Get)
+	}
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	return router
 }

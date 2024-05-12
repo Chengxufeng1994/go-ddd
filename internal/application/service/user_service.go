@@ -30,55 +30,100 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 		UserInfo:       valueobject.NewUserInfo(req.Age, req.FirstName, req.LastName),
 	}
 
-	rcustomer, err := s.userRepository.CreateUser(ctx, entity)
+	ruser, err := s.userRepository.CreateUser(ctx, entity)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dto.UserCreationResponse{
-		ID:        rcustomer.ID,
-		Active:    rcustomer.Active,
-		Email:     rcustomer.Email.String(),
-		Age:       rcustomer.UserInfo.Age(),
-		FirstName: rcustomer.UserInfo.FirstName(),
-		LastName:  rcustomer.UserInfo.LastName(),
-		CreatedAt: rcustomer.CreatedAt,
-		UpdatedAt: rcustomer.UpdatedAt,
+		ID:        ruser.ID,
+		Active:    ruser.Active,
+		Email:     ruser.Email.String(),
+		Age:       ruser.UserInfo.Age(),
+		FirstName: ruser.UserInfo.FirstName(),
+		LastName:  ruser.UserInfo.LastName(),
+		CreatedAt: ruser.CreatedAt,
+		UpdatedAt: ruser.UpdatedAt,
 	}, nil
 }
 
 func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
-	rcustomer, err := s.userRepository.GetUser(ctx, ID)
+	ruser, err := s.userRepository.GetUser(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dto.User{
-		ID:        rcustomer.ID,
-		Active:    rcustomer.Active,
-		Email:     rcustomer.Email.String(),
-		Age:       rcustomer.UserInfo.Age(),
-		FirstName: rcustomer.UserInfo.FirstName(),
-		LastName:  rcustomer.UserInfo.LastName(),
-		CreatedAt: rcustomer.CreatedAt,
-		UpdatedAt: rcustomer.UpdatedAt,
+		ID:        ruser.ID,
+		Active:    ruser.Active,
+		Email:     ruser.Email.String(),
+		Age:       ruser.UserInfo.Age(),
+		FirstName: ruser.UserInfo.FirstName(),
+		LastName:  ruser.UserInfo.LastName(),
+		CreatedAt: ruser.CreatedAt,
+		UpdatedAt: ruser.UpdatedAt,
 	}, nil
 }
 
-func (s *UserService) ListUsers(ctx context.Context) (*[]dto.User, error) {
-	criteria := repository.UserSearchCriteria{}
-	res, err := s.userRepository.SearchUsers(ctx, criteria)
+func (s *UserService) ListUsers(ctx context.Context, queryParams *dto.UserQueryParams) (*[]dto.User, *repository.PaginationResult, error) {
+	criteria := repository.PaginationCriteria{
+		Page:  queryParams.CurrentPage,
+		Limit: queryParams.PageSize,
+	}
+	res, pRes, err := s.userRepository.ListUsers(ctx, criteria)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dtos := make([]dto.User, 0, len(*res))
-	for _, cus := range *res {
+	for _, item := range *res {
 		dtos = append(dtos, dto.User{
-			ID: cus.ID,
+			ID:        item.ID,
+			Active:    item.Active,
+			Email:     item.Email.String(),
+			Age:       item.UserInfo.Age(),
+			FirstName: item.UserInfo.FirstName(),
+			LastName:  item.UserInfo.LastName(),
+			CreatedAt: item.CreatedAt,
+			UpdatedAt: item.UpdatedAt,
 		})
 	}
 
-	return &dtos, nil
+	return &dtos, pRes, nil
+}
+
+func (s *UserService) SearchUsers(ctx context.Context, queryParams *dto.UserQueryParams) (*[]dto.User, *repository.PaginationResult, error) {
+	criteria := repository.UserSearchCriteria{
+		PaginationCriteria: repository.PaginationCriteria{
+			Page:  queryParams.CurrentPage,
+			Limit: queryParams.PageSize,
+		},
+		OrderByCriteria: repository.OrderByCriteria{
+			SortBy:  queryParams.SortBy,
+			OrderBy: queryParams.OrderBy,
+		},
+		Email: queryParams.Email,
+	}
+
+	res, pRes, err := s.userRepository.SearchUsers(ctx, criteria)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dtos := make([]dto.User, 0, len(*res))
+	for _, item := range *res {
+		dtos = append(dtos, dto.User{
+			ID:        item.ID,
+			Active:    item.Active,
+			Email:     item.Email.String(),
+			Age:       item.UserInfo.Age(),
+			FirstName: item.UserInfo.FirstName(),
+			LastName:  item.UserInfo.LastName(),
+			CreatedAt: item.CreatedAt,
+			UpdatedAt: item.UpdatedAt,
+		})
+	}
+
+	return &dtos, pRes, nil
 }
 
 func (s *UserService) AddAccountWithUser(ctx context.Context, req *dto.AccountCreationRequest) (*dto.AccountCreationResponse, error) {

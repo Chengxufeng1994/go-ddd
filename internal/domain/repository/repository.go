@@ -13,7 +13,6 @@ type PaginationCriteria struct {
 
 type PaginationResult struct {
 	PaginationCriteria
-	Rows interface{} `json:"rows"`
 }
 
 func Pagination(criteria *PaginationCriteria) func(db *gorm.DB) *gorm.DB {
@@ -31,4 +30,14 @@ func Pagination(criteria *PaginationCriteria) func(db *gorm.DB) *gorm.DB {
 
 		return db.Offset(offset).Limit(limit)
 	}
+}
+
+const (
+	OrderByASC  string = "asc"
+	OrderByDESC string = "desc"
+)
+
+type OrderByCriteria struct {
+	SortBy  string
+	OrderBy string
 }
