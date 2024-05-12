@@ -27,10 +27,16 @@ swagger:
 	@swag init --parseInternal -g ./cmd/main.go --output ./docs
 
 docker-build:
-	docker build -t go-ddd .
+	@docker build -t go-ddd .
 
 docker-up:
-	docker run -d --name go-ddd -p 3030:3030 go-ddd
+	@docker run -d --name go-ddd -p 3030:3030 go-ddd
 
 docker-down:
-	docker rm -f go-ddd
+	@docker rm -f go-ddd
+
+dev-configmap:
+	@kubectl create configmap go-ddd-config --from-file=config/config.yaml --from-file=config/model.conf
+
+skaffold-dev:
+	@skaffold dev -p dev --wait-for-deletions=true --tail

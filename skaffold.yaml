@@ -2,30 +2,62 @@ apiVersion: skaffold/v4beta10
 kind: Config
 metadata:
   name: go-ddd
-build:
-  local:
-    push: false
-    concurrency: 0
-  artifacts:
-    - image: go-ddd
-      context: .
-      docker:
-        dockerfile: Dockerfile.dev
-      sync:
-        manual:
-          - dest: .
-            src: './**/*.go'
 
-manifests:
-  rawYaml:
-    - deploy/k8s/postgres-deployment.yaml
-    - deploy/k8s/postgres-service.yaml
-    - deploy/k8s/configmap.yaml
-    - deploy/k8s/deployment.yaml
-    - deploy/k8s/service.yaml
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      local:
+        push: false
+      artifacts:
+        - image: go-ddd
+          ko:
+            fromImage: gcr.io/distroless/base-debian11:debug
+            main: ./cmd
+            dependencies:
+              paths:
+              - "**/*.go"
+              - go.*
+          # context: .
+          # docker:
+          #   dockerfile: Dockerfile.dev
+          # sync:
+          #   manual:
+          #     - dest: .
+          #       src: './**/*.go'
 
-portForward:
-  - resourceType: deployment
-    resourceName: go-ddd
-    port: 3030
-    localPort: 3030
+    # manifests:
+    #   rawYaml:
+    #     - deploy/k8s/postgres-deployment.yaml
+    #     - deploy/k8s/postgres-service.yaml
+    #     - deploy/k8s/deployment.yaml
+    #     - deploy/k8s/service.yaml
+
+    deploy:
+      statusCheckDeadlineSeconds: 120
+      helm: # other options are kubectl
+        releases:
+        - name: postgres
+          repo: https://charts.bitnami.com/bitnami
+          remoteChart: postgresql
+          version: 15.2.12
+          namespace: default
+          wait: true
+          createNamespace: true
+          setValues:
+            auth.database: postgres
+            auth.username: root
+            auth.password: P@ssw0rd
+        - name: go-ddd
+          chartPath: deploy/helm  # path to your helm charts
+          valuesFiles:
+            - "deploy/helm/values.yaml"
+          recreatePods: true
+          version: 0.1.0
+
+    portForward:
+      - resourceType: deployment
+        resourceName: go-ddd-helm
+        port: 3030
+        localPort: 3030

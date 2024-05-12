@@ -20,6 +20,9 @@ func NewRouter(enforcer *casbin.Enforcer, controller *controller.Controller) *gi
 	router.Use(cors.Default())
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Ok")
+	})
 	apiv1 := router.Group("/api/v1")
 	apiv1.Use(middleware.CORSMiddleware())
 	{
