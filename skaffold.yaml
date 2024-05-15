@@ -49,6 +49,29 @@ profiles:
             auth.database: postgres
             auth.username: root
             auth.password: P@ssw0rd
+        - name: eck
+          repo: https://helm.elastic.co
+          remoteChart: eck-operator
+          version: 2.12.1
+          namespace: elastic-system
+          wait: true
+          createNamespace: true
+        - name: elastic
+          repo: https://helm.elastic.co
+          remoteChart: elasticsearch
+          version: 8.5.1
+          namespace: elastic-system
+          setValues:
+            replicas: 1
+            imageTag: 8.13.4
+        - name: kibana
+          repo: https://helm.elastic.co
+          remoteChart: kibana
+          version: 8.5.1
+          namespace: elastic-system
+          setValues:
+            replicas: 1
+            imageTag: 8.13.4
         - name: go-ddd
           chartPath: deploy/helm  # path to your helm charts
           valuesFiles:
@@ -57,7 +80,17 @@ profiles:
           version: 0.1.0
 
     portForward:
-      - resourceType: deployment
+      - resourceType: service
         resourceName: go-ddd-helm
         port: 3030
         localPort: 3030
+      - resourceType: service
+        resourceName: elasticsearch-master
+        namespace: elastic-system
+        port: 9200
+        localPort: 9200
+      - resourceType: service
+        resourceName: kibana-kibana
+        namespace: elastic-system
+        port: 5601
+        localPort: 5601
