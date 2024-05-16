@@ -1,6 +1,10 @@
 package po
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 type Role struct {
 	gorm.Model
@@ -12,5 +16,5 @@ type Role struct {
 
 // TableName sets the table name
 func (r Role) TableName() string {
-	return "roles"
+	return fmt.Sprintf("%s.%s", SCHEMA_PREFIX, "roles")
 }

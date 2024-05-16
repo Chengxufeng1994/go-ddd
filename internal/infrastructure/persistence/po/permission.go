@@ -1,6 +1,10 @@
 package po
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 // Permission represents the database model of permissions
 type Permission struct {
@@ -12,5 +16,5 @@ type Permission struct {
 
 // TableName sets the table name
 func (p Permission) TableName() string {
-	return "permissions"
+	return fmt.Sprintf("%s.%s", SCHEMA_PREFIX, "permissions")
 }

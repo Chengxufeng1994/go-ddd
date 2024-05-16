@@ -1,6 +1,10 @@
 package po
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 type RolePermission struct {
 	gorm.Model
@@ -9,5 +13,5 @@ type RolePermission struct {
 }
 
 func (rp *RolePermission) TableName() string {
-	return "role_permissions"
+	return fmt.Sprintf("%s.%s", SCHEMA_PREFIX, "role_permissions")
 }

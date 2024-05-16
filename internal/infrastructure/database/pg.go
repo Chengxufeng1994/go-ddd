@@ -21,7 +21,7 @@ func NewPgGorm(cfg *config.Postgres) (*gorm.DB, error) {
 			Colorful:      true,        // Disable color
 		})
 
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable search_path=%s TimeZone=UTC", cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName, "go_ddd")
 	pgCfg := postgres.Config{
 		DSN:                  dsn, // DSN data source name
 		PreferSimpleProtocol: false,

@@ -5,11 +5,14 @@ metadata:
 
 profiles:
   - name: dev
+    # automatically activate this profile when current context is "minikube"
     activation:
+      - kubeContext: minikube
       - command: dev
     build:
       local:
         push: false
+        useBuildkit: true
       artifacts:
         - image: go-ddd
           ko:
@@ -19,13 +22,6 @@ profiles:
               paths:
               - "**/*.go"
               - go.*
-          # context: .
-          # docker:
-          #   dockerfile: Dockerfile.dev
-          # sync:
-          #   manual:
-          #     - dest: .
-          #       src: './**/*.go'
 
     # manifests:
     #   rawYaml:
@@ -94,3 +90,11 @@ profiles:
         namespace: elastic-system
         port: 5601
         localPort: 5601
+
+  - name: prod
+    build:
+      artifacts:
+       - image: registry.local:5500/go-ddd
+         kaniko:
+           dockerfile: Dockerfile.dev
+      cluster: {}
