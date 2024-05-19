@@ -36,8 +36,9 @@ func main() {
 		fmt.Printf("error connecting database: %s\n", err)
 		os.Exit(1)
 	}
+	db.Exec("CREATE SCHEMA IF NOT EXISTS go_ddd")
 
-	err = db.AutoMigrate(&po.User{}, &po.Role{}, &po.UserRole{}, &po.Permission{}, &po.RolePermission{}, &po.Account{}, &po.Transfer{})
+	err = db.AutoMigrate(&po.User{}, &po.Role{}, &po.UserRole{}, &po.Menu{}, &po.Permission{}, &po.RolePermission{}, &po.Account{}, &po.Transfer{})
 	if err != nil {
 		fmt.Printf("error migrating database: %s\n", err)
 		os.Exit(1)
@@ -66,6 +67,7 @@ func main() {
 	userRepository := repository.NewGormUserRepository(db)
 	roleRepository := repository.NewGormRoleRepository(db)
 	permissionRepository := repository.NewGormPermissionRepository(db)
+	menuRepository := repository.NewGormMenuRepository(db)
 	// rbacRepository := repository.NewRBACRepository(db)
 	accountRepository := repository.NewGormAccountRepository(db)
 	transferRepository := repository.NewGormTransferRepository(db)
@@ -77,6 +79,7 @@ func main() {
 
 	authService := service.NewAuthService(userRepository)
 	userService := service.NewUserService(userRepository, accountRepository)
+	menuService := service.NewMenuService(menuRepository)
 	accountService := service.NewAccountService(accountRepository, userRepository)
 	transactionService := service.NewTransactionService(transferRepository, accountRepository, unitOfWorkRepository)
 
@@ -84,6 +87,7 @@ func main() {
 		AuthService:        authService,
 		AccountService:     accountService,
 		UserService:        userService,
+		MenuService:        menuService,
 		TransactionService: transactionService,
 	}
 	app := application.NewApplication(appCfg)

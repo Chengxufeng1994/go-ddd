@@ -14,7 +14,7 @@ RUN --mount=type=cache,mode=0755,target=/go/pkg/mod go mod download
 COPY . .
 RUN --mount=type=cache,target=/gomod_cache CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/main.go
 
-FROM alpine:latest
+FROM alpine:3.19
 ENV GOTRACEBACK=single
 
 WORKDIR /usr/local/app

@@ -20,8 +20,8 @@ profiles:
             main: ./cmd
             dependencies:
               paths:
-              - "**/*.go"
-              - go.*
+                - "**/*.go"
+                - go.*
 
     # manifests:
     #   rawYaml:
@@ -34,67 +34,85 @@ profiles:
       statusCheckDeadlineSeconds: 120
       helm: # other options are kubectl
         releases:
-        - name: postgres
-          repo: https://charts.bitnami.com/bitnami
-          remoteChart: postgresql
-          version: 15.2.12
-          namespace: default
-          wait: true
-          createNamespace: true
-          setValues:
-            auth.database: postgres
-            auth.username: root
-            auth.password: P@ssw0rd
-        - name: eck
-          repo: https://helm.elastic.co
-          remoteChart: eck-operator
-          version: 2.12.1
-          namespace: elastic-system
-          wait: true
-          createNamespace: true
-        - name: elastic
-          repo: https://helm.elastic.co
-          remoteChart: elasticsearch
-          version: 8.5.1
-          namespace: elastic-system
-          setValues:
-            replicas: 1
-            imageTag: 8.13.4
-        - name: kibana
-          repo: https://helm.elastic.co
-          remoteChart: kibana
-          version: 8.5.1
-          namespace: elastic-system
-          setValues:
-            replicas: 1
-            imageTag: 8.13.4
-        - name: go-ddd
-          chartPath: deploy/helm  # path to your helm charts
-          valuesFiles:
-            - "deploy/helm/values.yaml"
-          recreatePods: true
-          version: 0.1.0
+          - name: postgres
+            repo: https://charts.bitnami.com/bitnami
+            remoteChart: postgresql
+            version: 15.2.12
+            namespace: default
+            wait: true
+            createNamespace: true
+            setValues:
+              auth.database: postgres
+              auth.username: root
+              auth.password: P@ssw0rd
+          # - name: eck
+          #   repo: https://helm.elastic.co
+          #   remoteChart: eck-operator
+          #   version: 2.12.1
+          #   namespace: elastic-system
+          #   wait: true
+          #   createNamespace: true
+          # - name: elastic
+          #   repo: https://helm.elastic.co
+          #   remoteChart: elasticsearch
+          #   version: 8.5.1
+          #   namespace: elastic-system
+          #   setValues:
+          #     replicas: 1
+          #     imageTag: 8.13.4
+          # - name: kibana
+          #   repo: https://helm.elastic.co
+          #   remoteChart: kibana
+          #   version: 8.5.1
+          #   namespace: elastic-system
+          #   setValues:
+          #     replicas: 1
+          #     imageTag: 8.13.4
+          - name: go-ddd
+            chartPath: deploy/helm # path to your helm charts
+            valuesFiles:
+              - "deploy/helm/values.yaml"
+            recreatePods: true
+            version: 0.1.0
 
     portForward:
       - resourceType: service
         resourceName: go-ddd-helm
         port: 3030
         localPort: 3030
-      - resourceType: service
-        resourceName: elasticsearch-master
-        namespace: elastic-system
-        port: 9200
-        localPort: 9200
-      - resourceType: service
-        resourceName: kibana-kibana
-        namespace: elastic-system
-        port: 5601
-        localPort: 5601
+      # - resourceType: service
+      #   resourceName: elasticsearch-master
+      #   namespace: elastic-system
+      #   port: 9200
+      #   localPort: 9200
+      # - resourceType: service
+      #   resourceName: kibana-kibana
+      #   namespace: elastic-system
+      #   port: 5601
+      #   localPort: 5601
 
   - name: prod
     build:
+      tagPolicy:
+        gitCommit: {}
       artifacts:
-       - image: registry.local:5500/go-ddd
-         kaniko:
-           dockerfile: Dockerfile.dev
-      cluster: {}
+        - image: benny0329/go-ddd
+          kaniko:
+            dockerfile: Dockerfile.dev
+      cluster:
+        dockerConfig:
+          path: ./config.json
+    deploy:
+      helm:
+        releases:
+          - name: go-ddd
+            chartPath: deploy/helm
+            valuesFiles:
+              - "deploy/helm/values.yaml"
+            setValues:
+              image.repository: benny0329/go-ddd
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /usr/local/app/config
+            recreatePods: true
+            version: 0.1.0

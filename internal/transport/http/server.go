@@ -37,6 +37,14 @@ func NewRouter(enforcer *casbin.Enforcer, controller *controller.Controller) *gi
 		userGroup.GET("", controller.UserController.Query)
 		userGroup.GET("/:id", controller.UserController.Get)
 	}
+	menuGroup := apiv1.Group("/menus")
+	{
+		menuGroup.POST("", controller.MenuController.Create)
+		// menuGroup.GET("", controller.MenuController.Query)
+		menuGroup.GET("/:id", controller.MenuController.Get)
+		menuGroup.PUT("/:id", controller.MenuController.Update)
+		menuGroup.DELETE("/:id", controller.MenuController.Delete)
+	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	return router
