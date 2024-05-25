@@ -2,60 +2,27 @@ package http
 
 import (
 	"fmt"
-	"net/http"
+	"log"
+	nethttp "net/http"
+	"os"
 
 	"github.com/Chengxufeng1994/go-ddd/config"
-	docs "github.com/Chengxufeng1994/go-ddd/docs"
+	"github.com/Chengxufeng1994/go-ddd/internal/application"
 	"github.com/Chengxufeng1994/go-ddd/internal/transport/http/controller"
-	"github.com/Chengxufeng1994/go-ddd/internal/transport/http/middleware"
 	"github.com/casbin/casbin/v2"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewRouter(enforcer *casbin.Enforcer, controller *controller.Controller) *gin.Engine {
-	router := gin.Default()
-	router.Use(cors.Default())
-	docs.SwaggerInfo.BasePath = "/api/v1"
+func NewHttpServer(cfg *config.Transport, enforcer *casbin.Enforcer, app *application.Application) *nethttp.Server {
+	controller := controller.NewController(app)
+	router := NewRouter(enforcer, controller)
 
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "Ok")
-	})
-	apiv1 := router.Group("/api/v1")
-	apiv1.Use(middleware.CORSMiddleware())
-	{
-		apiv1.GET("/hello", controller.HelloController.SayHello)
-		apiv1.POST("/signup", controller.AuthController.SignUp)
-		apiv1.POST("/signin", controller.AuthController.SignIn)
-		apiv1.POST("/signout", controller.AuthController.SignOut)
-	}
+	var handler nethttp.Handler = router
 
-	userGroup := apiv1.Group("/users")
-	{
-		userGroup.GET("", controller.UserController.Query)
-		userGroup.GET("/:id", controller.UserController.Get)
-	}
-	menuGroup := apiv1.Group("/menus")
-	{
-		menuGroup.POST("", controller.MenuController.Create)
-		// menuGroup.GET("", controller.MenuController.Query)
-		menuGroup.GET("/:id", controller.MenuController.Get)
-		menuGroup.PUT("/:id", controller.MenuController.Update)
-		menuGroup.DELETE("/:id", controller.MenuController.Delete)
-	}
-
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	return router
-}
-
-func NewHttpServer(cfg *config.Transport, engine *gin.Engine) *http.Server {
 	addr := fmt.Sprintf("%s:%d", cfg.HTTP.Host, cfg.HTTP.Port)
-	srv := &http.Server{
-		Addr:    addr,
-		Handler: engine,
+	errStdLog := log.New(os.Stdout, "", log.LstdFlags)
+	return &nethttp.Server{
+		Addr:     addr,
+		Handler:  handler,
+		ErrorLog: errStdLog,
 	}
-
-	return srv
 }

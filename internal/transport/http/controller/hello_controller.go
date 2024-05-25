@@ -26,4 +26,5 @@ func NewHelloController() *HelloController {
 //	@Router			/hello [get]
 func (ctrl *HelloController) SayHello(c *gin.Context) {
 	c.JSON(http.StatusOK, "helloworld")
+	return
 }

@@ -19,7 +19,6 @@ import (
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/po"
 	"github.com/Chengxufeng1994/go-ddd/internal/infrastructure/persistence/repository"
 	"github.com/Chengxufeng1994/go-ddd/internal/transport/http"
-	"github.com/Chengxufeng1994/go-ddd/internal/transport/http/controller"
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 )
@@ -72,10 +71,6 @@ func main() {
 	accountRepository := repository.NewGormAccountRepository(db)
 	transferRepository := repository.NewGormTransferRepository(db)
 	unitOfWorkRepository := repository.New(db)
-	RoleSeeds(roleRepository)
-	PermissionSeeds(permissionRepository)
-	AssignPermissionsSeeds(permissionRepository)
-	UserSeeds(userRepository)
 
 	authService := service.NewAuthService(userRepository)
 	userService := service.NewUserService(userRepository, accountRepository)
@@ -91,13 +86,15 @@ func main() {
 		TransactionService: transactionService,
 	}
 	app := application.NewApplication(appCfg)
+	srv := http.NewHttpServer(&cfg.Transport, enforcer, app)
 
-	ctrl := controller.NewController(app)
-	router := http.NewRouter(enforcer, ctrl)
-	httpSrv := http.NewHttpServer(&cfg.Transport, router)
+	RoleSeeds(roleRepository)
+	PermissionSeeds(permissionRepository)
+	AssignPermissionsSeeds(permissionRepository)
+	UserSeeds(userRepository)
 
 	go func() {
-		err := httpSrv.ListenAndServe()
+		err := srv.ListenAndServe()
 		if errors.Is(err, nethttp.ErrServerClosed) {
 			fmt.Printf("server one closed\n")
 			errc <- err

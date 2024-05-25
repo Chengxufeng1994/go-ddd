@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/Chengxufeng1994/go-ddd/internal/application"
+import (
+	"github.com/Chengxufeng1994/go-ddd/internal/application"
+)
 
 type Controller struct {
 	HelloController   *HelloController
