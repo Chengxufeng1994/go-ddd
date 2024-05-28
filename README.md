@@ -28,3 +28,4 @@
 * [Domain Driven Design Best Practice with nodejs](https://medium.com/predictivehire/domain-driven-design-ddd-best-practice-with-node-js-mongodb-and-graphql-4d4f45289153)
 * [Domain Driven Design Example](https://www.mirkosertic.de/blog/2013/04/domain-driven-design-example/)
 * [ompluscator](https://www.ompluscator.com)
+* [how to develop locally for kubernetes using skaffold and minikube](https://medium.com/swlh/how-to-develop-locally-for-kubernetes-using-skaffold-and-minikube-b0072e71abd0)

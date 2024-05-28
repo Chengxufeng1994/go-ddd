@@ -92,11 +92,16 @@ volumes:
   - name: config-volume
     configMap:
       name: go-ddd-config
+  - name: go-ddd-data
+    persistentVolumeClaim:
+      claimName: go-ddd-pvc
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
   - name: config-volume
-    mountPath: /config
+    mountPath: /usr/local/app/config
+  - name: go-ddd-data
+    mountPath: /usr/local/app/data
 
 nodeSelector: {}
 

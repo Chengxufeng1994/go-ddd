@@ -15,13 +15,9 @@ profiles:
         useBuildkit: true
       artifacts:
         - image: go-ddd
-          ko:
-            fromImage: gcr.io/distroless/base-debian11:debug
-            main: ./cmd
-            dependencies:
-              paths:
-                - "**/*.go"
-                - go.*
+          context: .
+          docker:
+            dockerfile: Dockerfile.dev
 
     # manifests:
     #   rawYaml:
