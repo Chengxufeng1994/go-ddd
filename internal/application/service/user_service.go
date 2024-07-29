@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/Chengxufeng1994/go-ddd/internal/application/dto"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/service/command"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/service/query"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/usecase"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/entity"
 	"github.com/Chengxufeng1994/go-ddd/internal/domain/repository"
@@ -22,7 +24,7 @@ func NewUserService(customerRepository repository.UserRepository, accountReposit
 	}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationRequest) (*dto.UserCreationResponse, error) {
+func (s *UserService) CreateUser(ctx context.Context, req command.CreateUserCommand) (*command.CreateUserCommandResult, error) {
 	email, _ := valueobject.NewEmail(req.Email)
 	entity := &entity.User{
 		Email:          email,
@@ -35,7 +37,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 		return nil, err
 	}
 
-	return &dto.UserCreationResponse{
+	return &command.CreateUserCommandResult{
 		ID:        ruser.ID,
 		Active:    ruser.Active,
 		Email:     ruser.Email.String(),
@@ -47,13 +49,13 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.UserCreationReque
 	}, nil
 }
 
-func (s *UserService) GetUser(ctx context.Context, ID uint) (*dto.User, error) {
-	ruser, err := s.userRepository.GetUser(ctx, ID)
+func (s *UserService) GetUser(ctx context.Context, req query.GetUserQuery) (*query.GetUserQueryResult, error) {
+	ruser, err := s.userRepository.GetUser(ctx, req.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.User{
+	return &query.GetUserQueryResult{
 		ID:        ruser.ID,
 		Active:    ruser.Active,
 		Email:     ruser.Email.String(),

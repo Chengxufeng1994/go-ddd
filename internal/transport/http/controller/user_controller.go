@@ -6,6 +6,7 @@ import (
 
 	"github.com/Chengxufeng1994/go-ddd/internal/application/dto"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/dto/common"
+	"github.com/Chengxufeng1994/go-ddd/internal/application/service/query"
 	"github.com/Chengxufeng1994/go-ddd/internal/application/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -60,7 +61,7 @@ func (ctrl *UserController) Get(c *gin.Context) {
 		return
 	}
 
-	res, err := ctrl.userService.GetUser(c.Request.Context(), uint(id))
+	res, err := ctrl.userService.GetUser(c.Request.Context(), query.GetUserQuery{UserID: uint(id)})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, common.Response{
 			Code: http.StatusBadRequest,
