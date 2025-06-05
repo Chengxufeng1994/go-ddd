@@ -32,7 +32,7 @@ func NewAccountController(accountService usecase.AccountUseCase) *AccountControl
 //	@Failure		404	{object}	common.Response
 //	@Router			/accounts/{id} [get]
 func (ctrl *AccountController) Get(c *gin.Context) {
-	val := c.Param("account_id")
+	val := c.Param("id")
 	id, err := strconv.Atoi(val)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{

@@ -28,11 +28,13 @@ func NewTransactionService(trxRepository repository.TransferRepository, accountR
 
 // Transfer implements usecase.TransactionUseCase.
 func (s *TransactionService) Transfer(ctx context.Context, req *dto.TransferRequest) (*dto.TransferResponse, error) {
-	s.trxRepository.CreateTransfer(ctx, &entity.Transfer{
+	if _, err := s.trxRepository.CreateTransfer(ctx, &entity.Transfer{
 		FromAccountId: req.FromAccountId,
 		ToAccountId:   req.ToAccountId,
 		Amount:        req.Amount,
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	fromAccount, err := s.accountRepository.GetAccount(ctx, req.FromAccountId)
 	if err != nil {
@@ -85,11 +87,13 @@ func (s *TransactionService) TransferWithTrx(ctx context.Context, req *dto.Trans
 	var rToAccount *entity.Account
 
 	fn := func(store infra_repository.IUnitOfWorkStore) error {
-		store.Transfer().CreateTransfer(ctx, &entity.Transfer{
+		if _, err := store.Transfer().CreateTransfer(ctx, &entity.Transfer{
 			FromAccountId: req.FromAccountId,
 			ToAccountId:   req.ToAccountId,
 			Amount:        req.Amount,
-		})
+		}); err != nil {
+			return err
+		}
 
 		fromAccount, err := store.Account().GetAccount(ctx, req.FromAccountId)
 		if err != nil {
